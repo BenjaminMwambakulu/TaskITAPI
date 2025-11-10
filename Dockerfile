@@ -21,7 +21,7 @@ FROM php:8.4-fpm-alpine
 
 # Install system dependencies
 RUN apk add --no-cache \
-    postgresql-dev \
+    sqlite \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
@@ -33,7 +33,7 @@ RUN apk add --no-cache \
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 RUN docker-php-ext-install \
     pdo \
-    pdo_pgsql \
+    pdo_sqlite \
     bcmath \
     gd \
     zip \
@@ -66,5 +66,9 @@ COPY docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 # Expose port 9000
 EXPOSE 9000
 
-# Start PHP-FPM
-CMD ["php-fpm"]
+# Copy and set permissions for startup script
+COPY docker/php/start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
+
+# Start PHP-FPM using our startup script
+CMD ["/usr/local/bin/start.sh"]

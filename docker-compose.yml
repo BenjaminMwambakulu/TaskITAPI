@@ -11,14 +11,14 @@ services:
     volumes:
       - ./:/var/www
       - ./storage:/var/www/storage
+      - sqlite-data:/var/www/database
     networks:
       - taskit
     depends_on:
-      - db
       - redis
     environment:
-      - DB_HOST=db
-      - DB_PORT=5432
+      - DB_CONNECTION=sqlite
+      - DB_DATABASE=/var/www/database/database.sqlite
       - REDIS_HOST=redis
       - REDIS_PORT=6379
 
@@ -35,21 +35,6 @@ services:
       - taskit
     depends_on:
       - app
-
-  db:
-    image: postgres:16-alpine
-    container_name: taskit_db
-    restart: unless-stopped
-    environment:
-      - POSTGRES_DB=${DB_DATABASE}
-      - POSTGRES_USER=${DB_USERNAME}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-    volumes:
-      - dbdata:/var/lib/postgresql/data
-    networks:
-      - taskit
-    ports:
-      - "5432:5432"
 
   redis:
     image: redis:alpine
@@ -84,7 +69,7 @@ networks:
     driver: bridge
 
 volumes:
-  dbdata:
+  sqlite-data:
     driver: local
   redisdata:
     driver: local
