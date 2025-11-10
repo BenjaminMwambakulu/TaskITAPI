@@ -27,11 +27,14 @@ RUN apk add --no-cache \
     freetype-dev \
     zip \
     libzip-dev \
-    unzip
+    unzip \
+    $PHPIZE_DEPS \
+    oniguruma-dev \
+    linux-headers
 
 # Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-RUN docker-php-ext-install \
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install -j$(nproc) \
     pdo \
     pdo_sqlite \
     bcmath \
